@@ -39,15 +39,13 @@ pipeline {
             agent any
             steps {
                 unstash name: 'Checkout'
-                dir("data/hbase-alpine") {
-                    sh """
-                    VERSION=\$(cat VERSION)
-                    docker build . -t ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:latest
-                    docker tag ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:latest ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:\$VERSION
-                    docker push ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:\$VERSION
-                    docker push ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:latest
-                    """
-                }
+                sh """
+                VERSION=\$(cat VERSION)
+                docker build . -t ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:latest
+                docker tag ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:latest ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:\$VERSION
+                docker push ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:\$VERSION
+                docker push ${params.CONTAINER_REGISTRY}/hbase-alpine-ons:latest
+                """
             }
             post {
                 success {
