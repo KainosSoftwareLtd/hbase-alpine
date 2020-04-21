@@ -5,6 +5,16 @@ DATA_DIR="/data"
 LOGS_DIR="$DATA_DIR/logs"
 HBASE_DIR="$DATA_DIR/hbase"
 
+if [[ -z "${HBASE_REGIONSERVER_PORT}" ]]; then
+  HBASE_REGIONSERVER_PORT=16020
+fi
+echo "HBASE_REGIONSERVER_PORT=$HBASE_REGIONSERVER_PORT"
+
+if [[ -z "${ZOOKEEPER_CLIENT_PORT}" ]]; then
+  ZOOKEEPER_CLIENT_PORT=2181
+fi
+echo "ZOOKEEPER_CLIENT_PORT=$ZOOKEEPER_CLIENT_PORT"
+
 echo "Configuring HBase to use container hostname"
 cat << EOF > /opt/hbase/conf/hbase-site.xml
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
@@ -32,16 +42,21 @@ cat << EOF > /opt/hbase/conf/hbase-site.xml
 
   <property>
     <name>hbase.regionserver.port</name>
-    <value>16020</value>
+    <value>$HBASE_REGIONSERVER_PORT</value>
   </property>
+
+  <property>
+      <name>hbase.zookeeper.property.clientPort</name>
+      <value>$ZOOKEEPER_CLIENT_PORT</value>
+   </property>
 
 </configuration>
 EOF
 
 cat << EOF > /opt/hbase/conf/zoo.cfg
-clientPort=2181
+clientPort=$ZOOKEEPER_CLIENT_PORT
 clientPortAddress=$HOSTNAME
-server.1=$HOSTNAME:2181
+server.1=$HOSTNAME:$ZOOKEEPER_CLIENT_PORT
 EOF
 
 if [ -d $DATA_DIR ]; then
